@@ -1,16 +1,18 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {Container, Button, TextField, Grid, Typography, makeStyles} from "@material-ui/core";
+import {Container, Button, TextField, Grid, Typography, Icon, makeStyles} from "@material-ui/core";
+import './index.css';
 
 const useStyles = makeStyles(theme => ({
-  sendbox: {
-    // margin: theme.spacing.unit,
-    // position: "fixed",
-    // bottom: theme.spacing.unit * 2,
+  sendBox: {
+    margin: theme.spacing.unit,
+    position: "fixed",
+    bottom: theme.spacing.unit * 2,
+    display: 'flex',
+    alignItems: 'center',
   },
   chatbox: {
     borderRight: '1px solid lightgray',
     // border: '1px solid red',
-    minHeight: '300px',
   }
 }));
 
@@ -54,35 +56,54 @@ const App = () => {
     return () => ws.current.close()
   }, []);
 
+  function sendMessage(event) {
+    if (event.which === 13 && nickname && message) {
+      let m = nickname + ': ' + message
+      setMessages(prev => [...prev, m])
+      ws.current.send(m)
+      setMessage("")
+    }
+  }
+
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="xl">
       <Grid container spacing={3}>
         <Grid item sm={9}>
           <div className={classes.chatbox}>
             {messages.map((m, i) => (<div key={i}>{m}</div>))}
           </div>
-          <div className={classes.sendbox}>
-            <TextField value={message} onChange={(e) => setMessage(e.target.value)}/>
-            <Button onClick={() => {
-              if (nickname && message) {
-                let m = nickname + ': ' + message
-                setMessages(prev => [...prev, m])
-                ws.current.send(m)
-                setMessage("")
-              }
-            }} disabled={!connected} variant="contained" color="primary" disableElevation>Send</Button>
+          <div className={classes.sendBox}>
+            <TextField
+                style={{ marginRight: 10}}
+                label="Message" variant="outlined"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={sendMessage}
+            />
+            <Button
+                onClick={() => {
+                  if (nickname && message) {
+                    let m = nickname + ': ' + message
+                    setMessages(prev => [...prev, m])
+                    ws.current.send(m)
+                    setMessage("")
+                  }
+                }}
+                // disabled={!connected}
+                variant="contained" color="primary" disableElevation
+            >Send</Button>
           </div>
         </Grid>
         <Grid item sm={3}>
-          <div>
+          <div className="infoItem">
             <Typography variant="h6" component="h2">State</Typography>
             {connected ? <div>Chat server connected!</div> : <div>Connecting...</div>}
           </div>
-          <div>
+          <div className="infoItem">
             <Typography variant="h6" component="h2">Nickname</Typography>
             <TextField value={nickname} onChange={(e) => setNickname(e.target.value)}/>
           </div>
-          <div>
+          <div className="infoItem">
             <Typography variant="h6" component="h2">Members</Typography>
             <div>...</div>
           </div>
