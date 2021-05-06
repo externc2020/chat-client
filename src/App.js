@@ -1,19 +1,9 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {Container, Button, TextField, Grid, Typography, Icon, makeStyles} from "@material-ui/core";
+import {Container, Button, TextField, Grid, Typography, makeStyles} from "@material-ui/core";
 import './index.css';
 
 const useStyles = makeStyles(theme => ({
-  sendBox: {
-    margin: theme.spacing.unit,
-    position: "fixed",
-    bottom: theme.spacing.unit * 2,
-    display: 'flex',
-    alignItems: 'center',
-  },
-  chatbox: {
-    borderRight: '1px solid lightgray',
-    // border: '1px solid red',
-  }
+
 }));
 
 const App = () => {
@@ -66,33 +56,40 @@ const App = () => {
   }
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="xl" style={{ padding: 20, minHeight: '100vh' }}>
       <Grid container spacing={3}>
         <Grid item sm={9}>
-          <div className={classes.chatbox}>
-            {messages.map((m, i) => (<div key={i}>{m}</div>))}
+          <div className="chatBox">
+            <div className="chatItem">asdasdasadaasdasdasadaasdasdasadaasdasdasadaasdasdasadaasdasdasadaasdasdasada</div>
+            <div className="chatItem">asdasdasada</div>
+            <div className="chatItem">asdasdasada</div>
+            {messages.map((m, i) => (<div className="chatItem" key={i}>{m}</div>))}
           </div>
-          <div className={classes.sendBox}>
-            <TextField
-                style={{ marginRight: 10}}
-                label="Message" variant="outlined"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={sendMessage}
-            />
-            <Button
-                onClick={() => {
-                  if (nickname && message) {
-                    let m = nickname + ': ' + message
-                    setMessages(prev => [...prev, m])
-                    ws.current.send(m)
-                    setMessage("")
-                  }
-                }}
-                // disabled={!connected}
-                variant="contained" color="primary" disableElevation
-            >Send</Button>
-          </div>
+          <Grid container spacing={3}>
+            <Grid item sm={10}>
+              <TextField
+                  fullWidth
+                  label="Share your message" variant="outlined" rows={3} multiline
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyPress={sendMessage}
+              />
+            </Grid>
+            <Grid item sm={2}>
+              <Button
+                  onClick={() => {
+                    if (nickname && message) {
+                      let m = nickname + ': ' + message
+                      setMessages(prev => [...prev, m])
+                      ws.current.send(m)
+                      setMessage("")
+                    }
+                  }}
+                  // disabled={!connected}
+                  variant="contained" color="primary" disableElevation
+              >Send</Button>
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item sm={3}>
           <div className="infoItem">
