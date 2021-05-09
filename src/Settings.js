@@ -1,10 +1,27 @@
 import React, {useState} from 'react';
-import {Button, Container} from '@material-ui/core'
+import {Button, Grid, AppBar, Toolbar, Typography, IconButton, makeStyles} from '@material-ui/core'
+import {Menu as MenuIcon} from '@material-ui/icons'
+import {useHistory} from 'react-router-dom';
 import ed25519 from 'ed25519-wasm-pro';
+
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  title: {
+    flexGrow: 1,
+  },
+}));
 
 const Settings = () => {
 
-  const [key, setKey] = useState(null);
+  const [key, setKey] = useState(localStorage.getItem("pubkey") || "");
+  const classes = useStyles();
+  const history = useHistory();
 
   function createKeys() {
     let seed = ed25519.createSeed();
@@ -17,17 +34,37 @@ const Settings = () => {
   }
 
   return (
-    <Container maxWidth="xl" style={{padding: 20, minHeight: '100vh'}}>
-      <div>
-        <div>Public Key:</div>
-        <div>
-          {key && <code>{key}</code>}
-        </div>
-        <div>
-          <Button onClick={createKeys} variant="contained" color="primary">New Identity</Button>
-        </div>
-      </div>
-    </Container>
+    <div>
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" className={classes.title}>
+            Settings
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Grid container direction="column">
+        <Grid item>
+          <Button variant="contained" color="primary" onClick={() => history.push("/")}>Back to Chat</Button>
+        </Grid>
+        <Grid item>
+          <div>Public Key:</div>
+          <div>
+            {key && <code>{key}</code>}
+          </div>
+          <div>
+            {
+              key ?
+                <Button onClick={createKeys} variant="contained" color="primary">Change Identity</Button>
+                :
+                <Button onClick={createKeys} variant="contained" color="primary">New Identity</Button>
+            }
+          </div>
+        </Grid>
+      </Grid>
+    </div>
   )
 }
 

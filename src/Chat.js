@@ -1,10 +1,26 @@
 import React, {useEffect, useRef, useState} from 'react'
-import {Button, Container, Grid, Typography, Chip, Avatar} from "@material-ui/core"
-import './index.css'
-import {aes256} from 'aes-wasm'
+import {
+  AppBar,
+  Avatar,
+  Button,
+  Chip,
+  Container,
+  Grid,
+  IconButton,
+  makeStyles,
+  Toolbar,
+  Typography,
+  Drawer,
+  List,
+  Divider,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from "@material-ui/core"
 import ed25519 from 'ed25519-wasm-pro'
 import MessageEditor from "./MessageEditor"
 import _sodium from 'libsodium-wrappers'
+import {Menu as MenuIcon, People as ContactsIcon, Settings as SettingsIcon, Save as SaveIcon, Info as AboutIcon, Message as RoomIcon} from "@material-ui/icons";
 
 function randomAvatar() {
   let n = Math.floor(Math.random() * 3) + 1
@@ -84,12 +100,25 @@ const ConnectionIndicator = ({ws, onMessage}) => {
   )
 }
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  title: {
+    flexGrow: 1,
+  },
+}));
+
 const Chat = () => {
   const [messages, setMessages] = useState([
     {author: {nickname: "alice"}, content: {type: "text", value: "hello from alice"}},
     {author: {nickname: "bob"}, content: {type: "text", value: "hello from bob"}},
   ])
   const ws = useRef(null)
+  const classes = useStyles();
 
   function sendMessage(message) {
     return new Promise((resolve, reject) => {
@@ -157,25 +186,80 @@ const Chat = () => {
     })
   }
 
+
+  const [open, setOpen] = useState(false);
+
+  const toggleDrawer = (open) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+    setOpen(open);
+  };
+
+  const list = () => (
+    <div>
+      <List>
+        <ListItem button>
+          <ListItemIcon><RoomIcon/></ListItemIcon>
+          <ListItemText primary="New Room"/>
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon><ContactsIcon/></ListItemIcon>
+          <ListItemText primary="Contacts"/>
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon><SaveIcon/></ListItemIcon>
+          <ListItemText primary="Saved Messages"/>
+        </ListItem>
+      </List>
+      <Divider/>
+      <List>
+        <ListItem button>
+          <ListItemIcon><SettingsIcon/></ListItemIcon>
+          <ListItemText primary="Settings"/>
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon><AboutIcon/></ListItemIcon>
+          <ListItemText primary="About"/>
+        </ListItem>
+      </List>
+    </div>
+  )
+
   return (
-    <Container maxWidth="xl" style={{padding: 20}}>
-      <Grid container spacing={3}>
-        <Grid item sm={9}>
-          <div>
-            {messages.map((m, i) => (<Message key={i} author={m.author} content={m.content}>{m}</Message>))}
-          </div>
-          <MessageEditor sendMessage={sendMessage}/>
+    <div>
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+            <MenuIcon onClick={toggleDrawer(true)}/>
+            <Drawer anchor="left" open={open} onClose={toggleDrawer(false)}>
+              {list()}
+            </Drawer>
+          </IconButton>
+          <Typography variant="h6" className={classes.title}>
+            Chat
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Container maxWidth="xl" style={{padding: 20}}>
+        <Grid container spacing={3}>
+          <Grid item sm={9}>
+            <div>
+              {messages.map((m, i) => (<Message key={i} author={m.author} content={m.content}>{m}</Message>))}
+            </div>
+            <MessageEditor sendMessage={sendMessage}/>
+          </Grid>
+          <Grid item sm={3}>
+            <div className="infoItem">
+              <Typography variant="h6" component="h2">Relay Network</Typography>
+              <ConnectionIndicator ws={ws} onMessage={(msg) => {
+                setMessages(prev => [...prev, msg])
+              }}/>
+            </div>
+          </Grid>
         </Grid>
-        <Grid item sm={3}>
-          <div className="infoItem">
-            <Typography variant="h6" component="h2">Relay Network</Typography>
-            <ConnectionIndicator ws={ws} onMessage={(msg) => {
-              setMessages(prev => [...prev, msg])
-            }}/>
-          </div>
-        </Grid>
-      </Grid>
-    </Container>
+      </Container>
+    </div>
   );
 }
 
