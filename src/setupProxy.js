@@ -1,15 +1,14 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = function(app) {
-  app.use(
-    createProxyMiddleware(
+  app.use(createProxyMiddleware(
     '/ws',
     {
       target: 'http://127.0.0.1:8080/',
-      // changeOrigin: true,
+      changeOrigin: true,
       ws: true,
-      // secure: false,
-      logLevel: 'debug',
+      secure: false,
+      logLevel: 'error',
     })
   );
 };

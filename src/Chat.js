@@ -4,23 +4,31 @@ import {
   Avatar,
   Button,
   Chip,
-  Container,
+  Divider,
+  Drawer,
   Grid,
   IconButton,
-  makeStyles,
-  Toolbar,
-  Typography,
-  Drawer,
   List,
-  Divider,
   ListItem,
   ListItemIcon,
   ListItemText,
+  makeStyles,
+  Toolbar,
+  Typography,
 } from "@material-ui/core"
 import ed25519 from 'ed25519-wasm-pro'
-import MessageEditor from "./MessageEditor"
 import _sodium from 'libsodium-wrappers'
-import {Menu as MenuIcon, People as ContactsIcon, Settings as SettingsIcon, Save as SaveIcon, Info as AboutIcon, Message as RoomIcon} from "@material-ui/icons";
+import {
+  Info as AboutIcon,
+  Menu as MenuIcon,
+  Message as RoomIcon,
+  People as ContactsIcon,
+  Save as SaveIcon,
+  Settings as SettingsIcon
+} from "@material-ui/icons";
+import MessageEditor from "./components/MessageEditor";
+import { useTheme } from '@material-ui/core/styles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 function randomAvatar() {
   let n = Math.floor(Math.random() * 3) + 1
@@ -110,11 +118,31 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
   },
+  messageEditor: {
+    position: "fixed",
+    bottom: 0,
+    right: 0,
+  },
+  content: {
+    // background: "lightblue",
+    // padding: 200,
+    // height: "100vh",
+  }
 }));
 
 const Chat = () => {
   const [messages, setMessages] = useState([
     {author: {nickname: "alice"}, content: {type: "text", value: "hello from alice"}},
+    {author: {nickname: "bob"}, content: {type: "text", value: "hello from bob"}},
+    {author: {nickname: "bob"}, content: {type: "text", value: "hello from bob"}},
+    {author: {nickname: "bob"}, content: {type: "text", value: "hello from bob"}},
+    {author: {nickname: "bob"}, content: {type: "text", value: "hello from bob"}},
+    {author: {nickname: "bob"}, content: {type: "text", value: "hello from bob"}},
+    {author: {nickname: "bob"}, content: {type: "text", value: "hello from bob"}},
+    {author: {nickname: "bob"}, content: {type: "text", value: "hello from bob"}},
+    {author: {nickname: "bob"}, content: {type: "text", value: "hello from bob"}},
+    {author: {nickname: "bob"}, content: {type: "text", value: "hello from bob"}},
+    {author: {nickname: "bob"}, content: {type: "text", value: "hello from bob"}},
     {author: {nickname: "bob"}, content: {type: "text", value: "hello from bob"}},
   ])
   const ws = useRef(null)
@@ -226,39 +254,34 @@ const Chat = () => {
     </div>
   )
 
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.down('xs'));
+
   return (
-    <div>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            <MenuIcon onClick={toggleDrawer(true)}/>
-            <Drawer anchor="left" open={open} onClose={toggleDrawer(false)}>
-              {list()}
-            </Drawer>
-          </IconButton>
-          <Typography variant="h6" className={classes.title}>
-            Chat
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth="xl" style={{padding: 20}}>
-        <Grid container spacing={3}>
-          <Grid item sm={9}>
-            <div>
-              {messages.map((m, i) => (<Message key={i} author={m.author} content={m.content}>{m}</Message>))}
-            </div>
-            <MessageEditor sendMessage={sendMessage}/>
-          </Grid>
-          <Grid item sm={3}>
-            <div className="infoItem">
-              <Typography variant="h6" component="h2">Relay Network</Typography>
-              <ConnectionIndicator ws={ws} onMessage={(msg) => {
-                setMessages(prev => [...prev, msg])
-              }}/>
-            </div>
-          </Grid>
-        </Grid>
-      </Container>
+    <div style={{display: "grid", gridTemplateRows: matches ? "48px auto 48px" : "64px auto 48px", height: "100%"}}>
+      <div>
+        <AppBar>
+          <Toolbar>
+            <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+              <MenuIcon onClick={toggleDrawer(true)}/>
+              <Drawer anchor="left" open={open} onClose={toggleDrawer(false)}>
+                {list()}
+              </Drawer>
+            </IconButton>
+            <Typography variant="h6" className={classes.title}>
+              Room#001
+            </Typography>
+          </Toolbar>
+        </AppBar>
+      </div>
+      <div style={{overflow: "scroll"}}>
+        <div style={{padding: 16}}>
+          {messages.map((m, i) => (<Message key={i} author={m.author} content={m.content}>{m}</Message>))}
+        </div>
+      </div>
+      <div style={{background: "#f3f3f3", display: 'flex', justifyContent: "center", flexDirection: "column"}}>
+        <MessageEditor className={classes.messageEditor} sendMessage={sendMessage}/>
+      </div>
     </div>
   );
 }

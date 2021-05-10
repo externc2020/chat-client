@@ -1,10 +1,24 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import {CssBaseline, ThemeProvider, createMuiTheme} from "@material-ui/core";
+import React from 'react'
+import ReactDOM from 'react-dom'
+import App from './App'
+import reportWebVitals from './reportWebVitals'
+import {CssBaseline, ThemeProvider, createMuiTheme} from "@material-ui/core"
+import "./index.css"
 
 const theme = createMuiTheme({
+  // overrides: {
+  //   MuiCssBaseline: {
+  //     '@global': {
+  //       html: {
+  //         overflow: "hidden",
+  //         body: {
+  //           overflow: "hidden",
+  //           height: "100vh",
+  //         }
+  //       }
+  //     }
+  //   }
+  // },
   palette: {
     primary: {
       main: '#0277bd',
@@ -17,8 +31,8 @@ const theme = createMuiTheme({
 
 ReactDOM.render(
   <React.StrictMode>
-    <CssBaseline/>
     <ThemeProvider theme={theme}>
+      <CssBaseline/>
       <App/>
     </ThemeProvider>
   </React.StrictMode>,
